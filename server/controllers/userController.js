@@ -6,6 +6,8 @@ var salt = bcrypt.genSaltSync(10);
 
 export async function registerUser(req, res) {
   try {
+
+    console.log("Register User");
     const { name, email, password, proffession, about } = req.body;
 
     hashedPassword = bcrypt.hashSync({ password, salt });
@@ -36,7 +38,7 @@ export async function registerUser(req, res) {
     );
 
     // setting cookie
-
+ 
     return res
       .cookie("token", token, {
         httpOnly: true,
@@ -53,7 +55,8 @@ export async function registerUser(req, res) {
 }
 
 export async function loginUser(req, res) {
-
+  console.log("login user");
+  
   try {
 
     const { email, password } = req.body;
