@@ -6,12 +6,14 @@ import cookieParser from 'cookie-parser';
 import userRouter from './routers/userRouter.js'
 import adminRouter from './routers/adminRouter.js'
 import path from 'path'
+import morgan from 'morgan';
 
 const app=express();
 app.use(express.json())
 app.use(cookieParser());
 app.use(express.urlencoded({extended:true}))
 app.use(express.static(path.resolve()+"/public"))
+app.use(morgan('dev'))
 app.use(
   cors({
     origin: [

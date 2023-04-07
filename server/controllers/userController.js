@@ -1,16 +1,16 @@
 import User from "../models/userModel.js";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 var salt = bcrypt.genSaltSync(10);
 
 export async function registerUser(req, res) {
-  try {
+  try { 
 
     console.log("Register User");
     const { name, email, password, proffession, about } = req.body;
 
-    hashedPassword = bcrypt.hashSync({ password, salt });
+    const hashedPassword = bcrypt.hashSync( password, salt );
     const user = await User.findOne({ email });
     if (user) {
       return res.json({ error: true, massage: "This user already exist" });
@@ -18,14 +18,10 @@ export async function registerUser(req, res) {
 
 
     // user Created
-    const newUser = User.create({
-      name,
-      email,
-      password: hashedPassword,
-      about,
-      proffession,
-    });
-    console.log(newUser);
+    const newUser = new User({ name, email, password: hashedPassword, about, proffession })
+        await newUser.save();
+
+    console.log("new user",newUser);
 
 
 
@@ -36,18 +32,16 @@ export async function registerUser(req, res) {
       },
       "myjwtsecretkey"
     );
-
+      console.log("token",token);
     // setting cookie
  
-    return res
-      .cookie("token", token, {
-        httpOnly: true,
-        secure: true,
-        maxAge: 1000 * 60 * 24 * 7, // setting expiry for a month 
-        semSite: "none",
-      })
-      
-      .json({ error: false });
+    return res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+      sameSite: "none",
+  }).json({ error: false })
+   
   } catch (err) {
     console.log(err);
     res.json({ error: err });
@@ -102,7 +96,9 @@ export const userLogout = async (req, res) => {
 
 export const checkUserLoggedIn = async (req, res) => {
   try {
-    const token = req.cookie.token;
+    console.log("toekn auth",req?.cookies?.token);
+
+    const token = req.cookies?.token;
 
     if (!token)
       return res.json({ loggedIn: false, error: true, message: "no token" });
