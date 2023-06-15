@@ -122,7 +122,7 @@ export const editProfile = async (req, res) => {
   try {
     await User.findByIdAndUpdate(req.body.id, {
       $set: {
-        profile: req.profile.filename,
+        profile: req.file.filename,
       },
     });
 
